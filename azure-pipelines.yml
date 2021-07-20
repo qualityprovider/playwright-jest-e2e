@@ -25,7 +25,5 @@ stages:
   jobs:
   - job: e2e_testing_job
     displayName: 'Run E2E tests'
-    pool:
-      vmImage: 'ubuntu-latest'
     steps:
       - template: devops/e2e.testing.yml
