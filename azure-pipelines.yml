@@ -30,4 +30,4 @@ stages:
         vmImage: 'ubuntu-latest'
     displayName: 'Run E2E tests'
     steps:
-      - template: devops/e2e.testing.yml
+            - script: echo hello from Linux 
