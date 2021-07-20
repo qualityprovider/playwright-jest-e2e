@@ -4,6 +4,8 @@ trigger:
 - master
 - dev
 
+
+
 schedules:
 - cron: "0 5 * * *"
   displayName: Each morning at 5am
@@ -24,6 +26,8 @@ stages:
   displayName: 'E2E Testing'
   jobs:
   - job: e2e_testing_job
+    pool:
+        vmImage: 'ubuntu-latest'
     displayName: 'Run E2E tests'
     steps:
       - template: devops/e2e.testing.yml
