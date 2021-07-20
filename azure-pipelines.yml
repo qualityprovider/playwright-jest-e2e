@@ -17,7 +17,5 @@ stages:
   jobs:
   - job: e2e_testing_job
     displayName: 'Run E2E tests'
-    pool:
-      name: 'Hosted macOS'
     steps:
       - template: devops/e2e.testing.yml
