@@ -4,20 +4,7 @@ trigger:
 - master
 - dev
 
-
-
-schedules:
-- cron: "0 5 * * *"
-  displayName: Each morning at 5am
-  branches:
-    include:
-    - dev
-
 variables:
-- ${{ if eq(variables['build.SourceBranchName'], 'master') }}:
-  - group: estruyf-prod
-- ${{ if ne(variables['build.SourceBranchName'], 'master') }}:
-  - group: estruyf-dev
 - name: npm_config_cache
   value: $(Pipeline.Workspace)/.npm
 
@@ -27,41 +14,39 @@ stages:
   jobs:
   - job: e2e_testing_job
     pool:
-        vmImage: 'ubuntu-latest'
+      vmImage: 'ubuntu-latest'
     displayName: 'Run E2E tests'
     steps:
-    - task: NodeTool@0
-      displayName: 'Use Node 12.x'
-      inputs:
-        versionSpec: 12.x
+      - task: NodeTool@0
+        displayName: 'Use Node 12.x'
+        inputs:
+          versionSpec: 12.x
     
-    - task: Cache@2
-      inputs:
-        key: 'npm | "$(Agent.OS)" | package-lock.json'
-        restoreKeys: |
-          npm | "$(Agent.OS)"
-          npm
-        path: $(npm_config_cache)
-        displayName: Cache npm
+      - task: Cache@2
+       inputs:
+         key: 'npm | "$(Agent.OS)" | package-lock.json'
+         restoreKeys: |
+            npm | "$(Agent.OS)"
+            npm
+         path: $(npm_config_cache)
+          displayName: Cache npm
 
       - script: |
-       npm ci
-      displayName: 'Install project dependencies'
-    - bash: |
-        npm test
-      displayName: 'Run the tests'
-      env:
-        PASSWORD: $(password)
+            npm ci
+          displayName: 'Install project dependencies'
+       - bash: |
+           npm test
+          displayName: 'Run the tests'
   
-    - task: PublishTestResults@2
-      displayName: 'Publish the test reports'
-      inputs:
-       testResultsFiles: '**/reports/junit.xml'
-      condition: succeededOrFailed()
+      - task: PublishTestResults@2
+        displayName: 'Publish the test reports'
+        inputs:
+         testResultsFiles: '**/reports/junit.xml'
+        condition: succeededOrFailed()
 
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish screenshots'
-      inputs:
-        pathtoPublish: screenshots
-        artifactName: screenshots
-      continueOnError: true
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish screenshots'
+        inputs:
+         pathtoPublish: screenshots
+          artifactName: screenshots
+        continueOnError: true
