@@ -1,36 +1,45 @@
-name: 'Playwright E2E Testing'
-
 trigger:
 - master
-- dev
 
-variables:
-- name: npm_config_cache
-  value: $(Pipeline.Workspace)/.npm
+pool:
+  vmImage: 'ubuntu-18.04'
 
-stages:
-- stage: e2e_testing_stage
-  displayName: 'E2E Testing'
-  jobs:
-  - job: e2e_testing_job
-    pool:
-      vmImage: 'ubuntu-latest'
-    displayName: 'Run E2E tests'
-    steps:
-      - task: NodeTool@0
-        displayName: 'Use Node 12.x'
-        inputs:
-          versionSpec: 12.x
-          
-      - script: |
-          npm ci
-          displayName: 'Install project dependencies'
-      - bash: |
-          npm test
-          displayName: 'Run the tests'
-  
-      - task: PublishTestResults@2
-        displayName: 'Publish the test reports'
-        inputs:
-         testResultsFiles: '**/reports/junit.xml'
-        condition: succeededOrFailed()
+steps:
+# Install browser deps, starting with webkit
+# https://github.com/microsoft/playwright/issues/1062
+- bash: |
+    which bash
+    sudo apt-get install -y libwoff1 \
+                       libopus0 \
+                       libwebp6 \
+                       libwebpdemux2 \
+                       libenchant1c2a \
+                       libgudev-1.0-0 \
+                       libsecret-1-0 \
+                       libhyphen0 \
+                       libgdk-pixbuf2.0-0 \
+                       libegl1 \
+                       libnotify4 \
+                       libxslt1.1 \
+                       libevent-2.1-6 \
+                       libgles2 \
+                       libgl1 \
+                       libegl1 \
+                       libvpx5 \
+                       libnss3 \
+                       libxss1 \
+                       libasound2 \
+                       libdbus-glib-1-2 \
+                       libxt6
+  displayName: Multiline Bash script
+
+- task: NodeTool@0
+  inputs:
+    versionSpec: '12.x'
+  displayName: 'Install Node.js'
+
+- script: npm install
+  displayName: 'npm install'
+
+- script: npm run test
+  displayName: 'test-e2e'
