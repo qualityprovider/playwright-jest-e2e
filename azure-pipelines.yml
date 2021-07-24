@@ -21,21 +21,12 @@ stages:
         displayName: 'Use Node 12.x'
         inputs:
           versionSpec: 12.x
-    
-      - task: Cache@2
-         inputs:
-         key: 'npm | "$(Agent.OS)" | package-lock.json'
-         restoreKeys: |
-            npm | "$(Agent.OS)"
-            npm
-         path: $(npm_config_cache)
-          displayName: Cache npm
-
+          
       - script: |
-            npm ci
+          npm ci
           displayName: 'Install project dependencies'
-       - bash: |
-           npm test
+      - bash: |
+          npm test
           displayName: 'Run the tests'
   
       - task: PublishTestResults@2
